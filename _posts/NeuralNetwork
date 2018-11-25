@@ -3,3 +3,49 @@ w1*x1+w2*x2+b 를 이용하여 특정 좌표(x1,x2)를 맞는지 틀린지(1 또
 이진 분류의 결과에 sigmoid 함수를 적용하여 0~1까지 확률로 표현 가능
 sigmoid function = 1/(1+exp(-x))
 
+softmax는 여러 클래스에 대한 확률을 나타냄. 이때 세 클래스의 score가 1,2,3일때, 각 클래스의 점수는 1/(1+2+3)이 아니라, exp(1)/(exp(1)+exp(2)+exp(3))으로 계산함.
+exponential은 모든 입력에 양수표현이 가능하기 때문에 음수 표현도 커버할 수 있음
+
+import numpy as np
+def softmax(List):
+    expList = np.exp(List)
+    sumExpList = sum(expList)
+    result = []
+    for i in expList:
+        result.append(i*1.0/sumExpList)
+    return result
+# def softmax(List):
+#     expList = np.exp(List)
+#     return np.divide (expList, expList.sum())
+
+one-hot encoding은 해당 클래스에 해당하는 값만 1로 바꾸고 나머지는 모두 0으로 함. 이렇게하면 불필요한 dependency는 피할 수 있음
+ex) 오리 비버 거위
+오리  1   0   0
+비버  0   1   0
+거위  0   0   1
+
+Maximum Likelihood는 분류기에 의해 분류된 확률의 총 결과를 비교함으로써 이해하기 쉽다.
+예를 들어, 2개의 red, 2개의 blue가 있을 때 1번 분류기는 1 red, 1blue만 분류하여 0.1*0.6*0.7*0.2=0.0087이 나왔다면
+2번 분류기는 2red, 2blue를 모두 분류하여 0.7*0.9*0.8*0.6=0.3024로 30%의 결과가 나왔다.
+즉, 더 높은 확률로 결과를 이끌어 내는 방법이 Maximum Likelihood라 하겠다.
+
+우리는 Maximize Probability를 적용해야 최고의 결과를 얻을 수 있다.
+단순히 각 데이터의 확률을 곱하면 되지만, 0이라면? 이런 데이터는 결과를 엄청나게 바꾸고 이런 데이터는 피해야한다.
+따라서 product보다는 sum이 더 좋은 방법이다.
+이때, log함수로 계산하면 최고의 방법임. 왜냐면, log(ab) = log(a) + log(b)이므로...
+이때 상용로그 대신에 자연로그를 사용하는데, 계산에 더 유리하다고 함.
+근데, ln(0.7),ln(0.9),ln(0.8),ln(0.6)은 모두 음수임. ln(1)은 0이고 0~1은 음수라서...
+따라서, -ln(확률)을 하여 총 확률을 계산해준다. 
+=> -ln(0.7)-ln(0.9)-ln(0.8)-ln(0.6) = 1.2 (good model), -ln(0.1)-ln(0.6)-ln(0.7)-ln(0.2)=4.8 (bad model)
+
+이렇게 로그에 음수를 취해서 sum하는 계산 방법을 cross entropy라고 한다.
+좋은 모델의 cross entropy는 low, 나쁜 모델은 high를 나타냄. 그 이유는 확률이 낮을 수록 0에 가깝고 이를 로그 취하면 더 큰값을 냄.
+결과적으로 좋은 모델은 확률이 1에 가까우므로 0에 가깝고 안좋은 모델은 값이 커진다.
+
+import numpy as np
+def cross_entropy(Y, P):
+    Y = np.float_(Y)
+    P = np.float_(P)
+    return -np.sum(Y * np.log(P) + (1 - Y) * np.log(1 - P))
+
+
