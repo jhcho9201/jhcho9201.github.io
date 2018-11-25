@@ -48,4 +48,5 @@ def cross_entropy(Y, P):
     P = np.float_(P)
     return -np.sum(Y * np.log(P) + (1 - Y) * np.log(1 - P))
 
-
+multi cross entropy에서는 여러 클래스에서 cross-entropy를 계산함. 표현방법은 자유임.
+cross-entropy = -sum_i(sum_j(y_ij*ln(p_ij)))
