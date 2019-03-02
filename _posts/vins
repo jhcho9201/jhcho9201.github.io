@@ -1,0 +1,19 @@
+190302. Feature 생성 및 좌표계로 변환 정리
+
+READ IMAGE 함수
+
+// Track
+// Track은 Detect가 된 후에 들어갈 수 있음.
+cur_pts.size() > 0
+ //cur_img : 8bit first image, forw_img : second image, cur_pts : first image의 points(optical flow되는 points), forw_pts : cur_pts의 새로운 위치
+ //status : forw_pts의 결과(flow되었으면 1), err : err vector, cv::Size(21, 21) : pyramid level에서 window 크기, 3 : 3개 pyramids 사용
+ 1. calcOpticalFlowPyrLK(cur_img, forw_img, cur_pts, forw_pts, status, err, cv::Size(21, 21), 3)로 point 추적
+ 2. outlier 제거
+ //3차원 좌표계 -> 이미지 좌표계, forw_pts는 KLT로 만들어진 points
+ /* iPhone7인 경우 FOCUS_LENGTH_X = 526.958; FOCUS_LENGTH_Y = 527.179; PX = 244.473; PY = 313.844; */
+ 3. tmp.observation = (Vector2d((forw_pts[i].x - PX)/FOCUS_LENGTH_X, (forw_pts[i].y - PY)/FOCUS_LENGTH_Y));
+
+// Detect
+1. 현재 good points가 MAX_CNT(=70)보다 작다면 goodFeaturesToTrack으로 features를 detect
+
+
